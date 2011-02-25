@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /**
  * admin/features page callback.
