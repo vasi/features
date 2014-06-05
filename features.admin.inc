@@ -1129,7 +1129,7 @@ function features_admin_components($form, $form_state, $feature) {
   drupal_set_breadcrumb($breadcrumb);
 
   module_load_include('inc', 'features', 'features.export');
-  $form = array();
+  $form['#feature'] = $feature;
 
   // Store feature info for theme layer.
   $form['module'] = array('#type' => 'value', '#value' => $feature->name);
@@ -1193,8 +1193,14 @@ function features_admin_components($form, $form_state, $feature) {
     else if (array_key_exists($component, $conflicts)) {
       $storage = FEATURES_CONFLICT;
     }
+    // This can be removed if the css is fixed so link doesn't move when
+    // ajaxing and linke moved.
+    $lock_link = '<span class="features-lock-empty"></span>';
+    if (user_access('administer features') && (features_hook($component, 'features_revert') || features_hook($component, 'features_rebuild'))) {
+      $lock_link = ' ' . theme('features_lock_link', array('feature' => $feature->name, 'component' => $component));
+    }
     $form['components'][$component] = array(
-      '#markup' => theme('features_storage_link', array('storage' => $storage, 'path' =>  $path)),
+      '#markup' => $lock_link . theme('features_storage_link', array('storage' => $storage, 'path' =>  $path)),
     );
   }
 
@@ -1363,6 +1369,66 @@ function features_feature_diff($feature, $component = NULL) {
   }
   $output = array('page' => array('#markup' => "<div class='features-comparison'>{$output}</div>"));
   return $output;
+}
+
+
+
+/**
+ * Page callback to lock a component.
+ *
+ * @param $feature
+ *   A loaded feature object to display differences for.
+ * @param $component
+ *   (optional) Specific component to lock for
+ *
+ * @return
+ *   Themed display of what is different.
+ */
+function features_admin_lock($feature, $type = 'ajax', $component = NULL) {
+  if ($type == 'ajax' && !empty($_GET['token']) && drupal_valid_token($_GET['token'], 'features/' . $feature->name . '/' . ($component ? $component : '')) == $_GET['token']) {
+    if (features_feature_locked($feature->name, $component)) {
+      features_feature_unlock($feature->name, $component);
+    }
+    else {
+      features_feature_lock($feature->name, $component);
+    }
+    $commands = array();
+    $new_link = theme('features_lock_link', array('feature' => $feature->name, 'component' => $component));
+    $commands[] = ajax_command_replace('#features-lock-link-' . $feature->name . ($component ? '-' . $component : ''),  $new_link);
+    $page = array('#type' => 'ajax', '#commands' => $commands);
+    ajax_deliver($page);
+  }
+  else {
+    return drupal_get_form('features_feature_lock_form', $feature, $component);
+  }
+}
+
+/**
+ * Confirm form for locking a feature.
+ */
+function features_feature_lock_form($form, $form_state, $feature, $component) {
+  $form['#feature'] = $feature;
+  $form['#component'] = $component;
+  $is_locked = features_feature_locked($feature->name, $component);
+  $question = $is_locked ? t('Are you sure you want to unlock this Feature @name (component @component).', array('@name' => $feature->name, '@component' => $component ? $component : t('none'))): t('Are you sure you want to lock this component?');
+  return confirm_form($form, $question, 'admin/structure/features/' . $feature->name);
+}
+
+/**
+ * Locks a feature.
+ */
+function features_feature_lock_form_submit($form, &$form_state) {
+  $feature = $form['#feature']->name;
+  $component = $form['#component'];
+  if (features_feature_locked($feature, $component)) {
+    features_feature_unlock($feature, $component);
+    drupal_set_message(t('Feature @name (component @component) has been unlocked.', array('@name' => $feature, '@component' => $component ? $component : t('none'))));
+  }
+  else {
+    features_feature_lock($feature, $component);
+    drupal_set_message(t('Feature @name (component @component) has been locked.', array('@name' => $feature, '@component' => $component ? $component : t('none'))));
+  }
+  $form_state['redirect'] = 'admin/structure/features/' . $feature;
 }
 
 /**
