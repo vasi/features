@@ -118,7 +118,7 @@ function theme_features_lock_link($vars) {
   drupal_add_library('system', 'drupal.ajax');
   $component = $vars['component'] ? $vars['component'] : '';
   $feature = $vars['feature'];
-  $is_locked = features_feature_locked($feature, $component);
+  $is_locked = features_feature_is_locked($feature, $component);
   $options = array(
     'attributes' => array(
       'class' => array('use-ajax features-lock-icon ui-icon ' . ($is_locked ? ' ui-icon-locked' : ' ui-icon-unlocked')),

@@ -726,7 +726,7 @@ function drush_features_revert() {
             $dt_args['@component'] = $component;
             $confirmation_message = 'Do you really want to revert @module.@component?';
             if ($skip_confirmation || drush_confirm(dt($confirmation_message, $dt_args))) {
-              if (features_feature_locked($module, $component)) {
+              if (features_feature_is_locked($module, $component)) {
                 drush_log(dt('Skipping locked @module.@component.', $dt_args), 'ok');
               }
               else {

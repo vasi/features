@@ -1377,16 +1377,16 @@ function features_feature_diff($feature, $component = NULL) {
  * Page callback to lock a component.
  *
  * @param $feature
- *   A loaded feature object to display differences for.
+ *  Loaded feature object to be processed for component locking.
  * @param $component
- *   (optional) Specific component to lock for
+ *   (optional) A specific component to lock.
  *
  * @return
  *   Themed display of what is different.
  */
 function features_admin_lock($feature, $type = 'ajax', $component = NULL) {
   if ($type == 'ajax' && !empty($_GET['token']) && drupal_valid_token($_GET['token'], 'features/' . $feature->name . '/' . ($component ? $component : '')) == $_GET['token']) {
-    if (features_feature_locked($feature->name, $component)) {
+    if (features_feature_is_locked($feature->name, $component)) {
       features_feature_unlock($feature->name, $component);
     }
     else {
@@ -1399,34 +1399,39 @@ function features_admin_lock($feature, $type = 'ajax', $component = NULL) {
     ajax_deliver($page);
   }
   else {
-    return drupal_get_form('features_feature_lock_form', $feature, $component);
+    return drupal_get_form('features_feature_lock_confirm_form', $feature, $component);
   }
 }
 
 /**
  * Confirm form for locking a feature.
  */
-function features_feature_lock_form($form, $form_state, $feature, $component) {
+function features_feature_lock_confirm_form($form, $form_state, $feature, $component) {
   $form['#feature'] = $feature;
   $form['#component'] = $component;
-  $is_locked = features_feature_locked($feature->name, $component);
-  $question = $is_locked ? t('Are you sure you want to unlock this Feature @name (component @component).', array('@name' => $feature->name, '@component' => $component ? $component : t('none'))): t('Are you sure you want to lock this component?');
+  $is_locked = features_feature_is_locked($feature->name, $component);
+  $args = array(
+    '@name' => $feature->name,
+    '@component' => $component ? $component : t('all'),
+    '!action' => $is_locked ? t('unlock') : t('lock'),
+  );
+  $question = t('Are you sure you want to !action this Feature @name (component @component)?', $args);
   return confirm_form($form, $question, 'admin/structure/features/' . $feature->name);
 }
 
 /**
- * Locks a feature.
+ * Submit callback to lock components of a feature.
  */
-function features_feature_lock_form_submit($form, &$form_state) {
+function features_feature_lock_confirm_form_submit($form, &$form_state) {
   $feature = $form['#feature']->name;
   $component = $form['#component'];
-  if (features_feature_locked($feature, $component)) {
+  if (features_feature_is_locked($feature, $component)) {
     features_feature_unlock($feature, $component);
-    drupal_set_message(t('Feature @name (component @component) has been unlocked.', array('@name' => $feature, '@component' => $component ? $component : t('none'))));
+    drupal_set_message(t('Feature @name (component @component) has been unlocked.', array('@name' => $feature, '@component' => $component ? $component : t('all'))));
   }
   else {
     features_feature_lock($feature, $component);
-    drupal_set_message(t('Feature @name (component @component) has been locked.', array('@name' => $feature, '@component' => $component ? $component : t('none'))));
+    drupal_set_message(t('Feature @name (component @component) has been locked.', array('@name' => $feature, '@component' => $component ? $component : t('all'))));
   }
   $form_state['redirect'] = 'admin/structure/features/' . $feature;
 }
