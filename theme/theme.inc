@@ -117,6 +117,15 @@ function theme_features_lock_link($vars) {
   drupal_add_library('system', 'ui');
   drupal_add_library('system', 'drupal.ajax');
   $component = $vars['component'] ? $vars['component'] : '';
+  if ($component && features_component_is_locked($component)) {
+    return l(t('Component locked'), 'admin/structure/features/settings', array(
+      'attributes' => array(
+        'class' => 'features-lock-icon ui-icon ui-icon-locked',
+        'title' => t('This component is locked on a global level.'),
+      ),
+      'fragment' => 'edit-lock-components',
+    ));
+  }
   $feature = $vars['feature'];
   $is_locked = features_feature_is_locked($feature, $component);
   $options = array(
