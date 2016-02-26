@@ -9,6 +9,7 @@ namespace Drupal\features;
 
 use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Config\ExtensionInstallStorage;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Config\StorageInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
@@ -273,7 +274,17 @@ class FeaturesAssigner implements FeaturesAssignerInterface {
    */
   public function createBundleFromDefault($machine_name, $name = NULL, $description = NULL, $is_profile = FALSE, $profile_name = NULL) {
     // Duplicate the default bundle to get its default configuration.
-    $bundle = $this->getBundle(FeaturesBundleInterface::DEFAULT_BUNDLE)->createDuplicate();
+    $default = $this->getBundle(FeaturesBundleInterface::DEFAULT_BUNDLE);
+    if (!$default) {
+      // If we don't have the default installed, generate it from the install
+      // config file.
+      $ext_storage = new ExtensionInstallStorage($this->configStorage);
+      $record = $ext_storage->read('features.bundle.default');
+      $bundle_storage = \Drupal::entityTypeManager()->getStorage('features_bundle');
+      $default = $bundle_storage->createFromStorageRecord($record);
+    }
+
+    $bundle = $default->createDuplicate();
 
     $bundle->setMachineName($machine_name);
     $bundle->setName($name);

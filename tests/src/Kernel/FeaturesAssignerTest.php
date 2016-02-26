@@ -19,9 +19,12 @@ class FeaturesAssignerTest extends KernelTestBase {
   protected $strictConfigSchema = FALSE;
 
   /**
-   * Test bundle auto-creation while features is being installed too.
+   * Test bundle auto-creation during config import.
+   *
+   * We check the case where the import also causes features to be installed,
+   * so at the time auto-creation happens there's not yet a default bundle.
    */
-  public function testBundleAutoCreationImportDuringInstall() {
+  public function testBundleAutoCreationImport() {
     // Install the feature.
     $installer = $this->container->get('module_installer');
     // Have to do these separately so features_modules_installed() doesn't
