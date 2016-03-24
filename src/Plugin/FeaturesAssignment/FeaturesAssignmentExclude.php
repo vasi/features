@@ -32,7 +32,7 @@ class FeaturesAssignmentExclude extends FeaturesAssignmentMethodBase {
    */
   public function assignPackages($force = FALSE) {
     $current_bundle = $this->assigner->getBundle();
-    $settings = $current_bundle->getAssignmentSettings(self::METHOD_ID);
+    $settings = $this->assigner->getAssignmentSettings(self::METHOD_ID);
 
     $config_collection = $this->featuresManager->getConfigCollection();
 
@@ -141,6 +141,21 @@ class FeaturesAssignmentExclude extends FeaturesAssignmentMethodBase {
 
     // Register the updated data.
     $this->featuresManager->setConfigCollection($config_collection);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function defaultSettings() {
+    return parent::defaultSettings() + [
+      'curated' => FALSE,
+      'module' => [
+        'installed' => FALSE,
+        'profile' => FALSE,
+        'namespace' => FALSE,
+      ],
+      'types' => ['config' => []],
+    ];
   }
 
 }

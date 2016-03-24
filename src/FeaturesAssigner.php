@@ -414,4 +414,17 @@ class FeaturesAssigner implements FeaturesAssignerInterface {
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getAssignmentSettings($method_id, $bundle = NULL) {
+    if (empty($bundle)) {
+      $bundle = $this->getBundle();
+    }
+    $settings = $bundle->getAssignmentSettings($method_id);
+    $settings += $this->getAssignmentMethodInstance($method_id)->defaultSettings();
+    $settings += ['enabled' => FALSE, 'weight' => 999];
+    return $settings;
+  }
+
 }

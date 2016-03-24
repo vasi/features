@@ -86,7 +86,7 @@ abstract class FeaturesAssignmentMethodBase implements FeaturesAssignmentMethodI
    */
   protected function assignPackageByConfigTypes($method_id, $machine_name, $force = FALSE) {
     $current_bundle = $this->assigner->getBundle();
-    $settings = $current_bundle->getAssignmentSettings($method_id);
+    $settings = $this->assigner->getAssignmentSettings($method_id);
     $types = $settings['types']['config'];
 
     $config_collection = $this->featuresManager->getConfigCollection();
@@ -114,7 +114,7 @@ abstract class FeaturesAssignmentMethodBase implements FeaturesAssignmentMethodI
    */
   protected function assignSubdirectoryByConfigTypes($method_id, $subdirectory) {
     $current_bundle = $this->assigner->getBundle();
-    $settings = $current_bundle->getAssignmentSettings($method_id);
+    $settings = $this->assigner->getAssignmentSettings($method_id);
     $types = $settings['types']['config'];
 
     $config_collection = $this->featuresManager->getConfigCollection();
@@ -128,6 +128,13 @@ abstract class FeaturesAssignmentMethodBase implements FeaturesAssignmentMethodI
     unset($item);
 
     $this->featuresManager->setConfigCollection($config_collection);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function defaultSettings() {
+    return [];
   }
 
 }

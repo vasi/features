@@ -35,7 +35,7 @@ class FeaturesAssignmentProfile extends FeaturesAssignmentMethodBase {
     $current_bundle = $this->assigner->getBundle();
 
     if ($current_bundle->isProfile()) {
-      $settings = $current_bundle->getAssignmentSettings(self::METHOD_ID);
+      $settings = $this->assigner->getAssignmentSettings(self::METHOD_ID);
 
       // Ensure the profile package exists.
       $profile_name = $current_bundle->getProfileName();
@@ -174,6 +174,20 @@ class FeaturesAssignmentProfile extends FeaturesAssignmentMethodBase {
     return [
       'contact.form.feedback',
       'user.role.administrator'
+    ];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function defaultSettings() {
+    return parent::defaultSettings() + [
+      'types' => ['config' => []],
+      'curated' => FALSE,
+      'standard' => [
+        'files' => FALSE,
+        'dependencies' => FALSE,
+      ],
     ];
   }
 

@@ -40,4 +40,13 @@ class FeaturesAssignmentCoreType extends FeaturesAssignmentMethodBase {
     $this->assignPackageByConfigTypes(self::METHOD_ID, $machine_name, $force);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function defaultSettings() {
+    return parent::defaultSettings() + [
+      'types' => ['config' => []],
+    ];
+  }
+
 }

@@ -29,7 +29,7 @@ class AssignmentExcludeForm extends AssignmentFormBase {
   public function buildForm(array $form, FormStateInterface $form_state, $bundle_name = NULL) {
     $this->currentBundle = $this->assigner->loadBundle($bundle_name);
 
-    $settings = $this->currentBundle->getAssignmentSettings(self::METHOD_ID);
+    $settings = $this->assigner->getAssignmentSettings(self::METHOD_ID, $this->currentBundle);
     $this->setConfigTypeSelect($form, $settings['types']['config'], $this->t('exclude'));
 
     $module_settings = $settings['module'];
@@ -98,7 +98,7 @@ class AssignmentExcludeForm extends AssignmentFormBase {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     // Merge in selections.
-    $settings = $this->currentBundle->getAssignmentSettings(self::METHOD_ID);
+    $settings = $this->assigner->getAssignmentSettings(self::METHOD_ID, $this->currentBundle);
     $settings = array_merge($settings, [
       'types' => $form_state->getValue('types'),
       'curated' => $form_state->getValue('curated'),

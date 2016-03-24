@@ -230,4 +230,17 @@ interface FeaturesAssignerInterface {
    */
   public function loadBundle($machine_name = NULL);
 
+  /**
+   * Get the settings for an assignment method.
+   *
+   * @param string $method_id
+   *   The string identifier of the package assignment method.
+   * @param \Drupal\features\FeaturesBundleInterface
+   *   Bundle to get settings from.
+   *
+   * @return array
+   *   The assignment method's settings.
+   */
+  public function getAssignmentSettings($method_id, $bundle = NULL);
+
 }

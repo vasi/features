@@ -33,7 +33,7 @@ class FeaturesAssignmentBaseType extends FeaturesAssignmentMethodBase {
    */
   public function assignPackages($force = FALSE) {
     $current_bundle = $this->assigner->getBundle();
-    $settings = $current_bundle->getAssignmentSettings(self::METHOD_ID);
+    $settings = $this->assigner->getAssignmentSettings(self::METHOD_ID);
     $config_base_types = $settings['types']['config'];
 
     $config_types = $this->featuresManager->listConfigTypes();
@@ -68,6 +68,18 @@ class FeaturesAssignmentBaseType extends FeaturesAssignmentMethodBase {
         $this->featuresManager->initPackage($entity_type_id, $label, $description, 'module', $current_bundle);
       }
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function defaultSettings() {
+    return parent::defaultSettings() + [
+      'types' => [
+        'config' => [],
+        'content' => [],
+      ],
+    ];
   }
 
 }

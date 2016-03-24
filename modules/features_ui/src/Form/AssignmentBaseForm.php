@@ -28,7 +28,7 @@ class AssignmentBaseForm extends AssignmentFormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state, $bundle_name = NULL) {
     $this->currentBundle = $this->assigner->loadBundle($bundle_name);
-    $settings = $this->currentBundle->getAssignmentSettings(self::METHOD_ID);
+    $settings = $this->assigner->getAssignmentSettings(self::METHOD_ID, $this->currentBundle);
 
     // Pass the last argument to limit the select to config entity types that
     // provide bundles for other entity types.
@@ -55,7 +55,7 @@ class AssignmentBaseForm extends AssignmentFormBase {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     // Merge in types selections.
-    $settings = $this->currentBundle->getAssignmentSettings(self::METHOD_ID);
+    $settings = $this->assigner->getAssignmentSettings(self::METHOD_ID, $this->currentBundle);
     $settings['types'] = $form_state->getValue('types');
     $this->currentBundle->setAssignmentSettings(self::METHOD_ID, $settings)->save();
     $this->setRedirect($form_state);

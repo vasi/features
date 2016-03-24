@@ -40,4 +40,13 @@ class FeaturesAssignmentOptionalType extends FeaturesAssignmentMethodBase {
     $this->assignSubdirectoryByConfigTypes(self::METHOD_ID, InstallStorage::CONFIG_OPTIONAL_DIRECTORY);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function defaultSettings() {
+    return parent::defaultSettings() + [
+      'types' => ['config' => []],
+    ];
+  }
+
 }

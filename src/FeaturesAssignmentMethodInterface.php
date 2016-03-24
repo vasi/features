@@ -57,4 +57,12 @@ interface FeaturesAssignmentMethodInterface {
    */
   public function assignPackages($force = FALSE);
 
+  /**
+   * Get the default settings for this assignment.
+   *
+   * @return array
+   *   The settings, not including the keys 'weight' or 'enabled'.
+   */
+  public function defaultSettings();
+
 }
