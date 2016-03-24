@@ -208,6 +208,12 @@ class FeaturesBundle extends ConfigEntityBase implements FeaturesBundleInterface
     foreach ($this->assignments as $method_id => &$method) {
       $method['enabled'] = in_array($method_id, $assignments);
     }
+
+    // Add any new assignments that we don't yet know about.
+    $new_assignments = array_diff($assignments, array_keys($this->assignments));
+    foreach ($new_assignments as $method_id) {
+      $this->assignments[$method_id] = ['enabled' => TRUE];
+    }
   }
 
   /**
